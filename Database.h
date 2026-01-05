@@ -19,23 +19,13 @@ private:
     std::string password = "123456";
 
 public:
-    // 构造函数：自动检查并创建数据库
     Database();
-
-    // 获取数据库连接
-    pqxx::connection& getConnection();
-
-    // 检查连接状态
-    bool isConnected() const;
-
-    // 执行SQL语句
-    void execute(const std::string& sql);
-
-    // 执行查询并返回结果
-    pqxx::result query(const std::string& sql);
-
-    // 创建选课系统所需的表
-    void createTables();
+    ~Database();
+    pqxx::connection& getConnection();                      //获取数据库连接
+    bool isConnected() const;                               //检查连接状态
+    virtual void execute(const std::string& sql);           //执行SQL语句
+   // virtual pqxx::result query(const std::string& sql);     //执行查询并返回结果
+    void createTables();                                    //创建选课系统所需的表
 
 private:
 
@@ -50,6 +40,7 @@ Database::Database() {
     std::print("初始化数据库...\n");
     try {
         if(!databaseExists()) throw std::runtime_error("数据库不存在");
+
         connection = make_unique<pqxx::connection>(buildConnectionString());
 
         if (connection->is_open()) {
@@ -66,6 +57,10 @@ Database::Database() {
         throw;
     }
 }
+Database::~Database(){
+
+        std::print("清除");
+}
 
 // 构建连接字符串
 std::string Database::buildConnectionString(bool includeDbName) {
@@ -81,8 +76,9 @@ std::string Database::buildConnectionString(bool includeDbName) {
 
 // 检查数据库是否存在
 bool Database::databaseExists() {
-    try {
-        pqxx::connection adminConn(buildConnectionString(false) + " dbname=postgres");
+        std::string connStr = buildConnectionString(false);
+        connStr += " dbname=postgres";
+        pqxx::connection adminConn(connStr);
         pqxx::work txn(adminConn);
 
         std::string sql = "SELECT 1 FROM pg_database WHERE datname = '" + dbname + "'";
@@ -90,10 +86,6 @@ bool Database::databaseExists() {
 
         txn.commit();
         return !result.empty();
-
-    } catch (...) {
-        return false;
-    }
 }
 
 
@@ -103,44 +95,39 @@ void Database::createTables() {
         // 学生表
         execute(R"(
             CREATE TABLE IF NOT EXISTS students (
-                id SERIAL PRIMARY KEY,
-                student_id VARCHAR(20) UNIQUE NOT NULL,
+                id  VARCHAR(20) NOT NULL,
                 name VARCHAR(50) NOT NULL,
                 password VARCHAR(50) DEFAULT '123456',
-                email VARCHAR(100),
-                department VARCHAR(50),
+                major VARCHAR(50) ,
                 total_credits INT DEFAULT 0,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                grade VARCHAR(20),
+                current_session VARCHAR(20) DEFAULT '01',
+                PRIMARY KEY(id)
             )
         )");
 
         // 课程表
         execute(R"(
             CREATE TABLE IF NOT EXISTS courses (
-                id SERIAL PRIMARY KEY,
-                course_code VARCHAR(20) UNIQUE NOT NULL,
-                course_name VARCHAR(100) NOT NULL,
+                id VARCHAR(20),
+                name VARCHAR(100) NOT NULL,
                 credits INT NOT NULL,
                 capacity INT NOT NULL,
-                current_enrollment INT DEFAULT 0,
-                is_open BOOLEAN DEFAULT true,
-                teacher_id INT,
-                teacher_name VARCHAR(50),
-                time_slot VARCHAR(50),
-                classroom VARCHAR(50),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                current_capacity INT DEFAULT 0,
+                teacher_id VARCHAR(20),
+                session VARCHAR(20),
+                grade VARCHAR(20),
+                PRIMARY KEY(id)
             )
         )");
 
         // 选课记录表
         execute(R"(
             CREATE TABLE IF NOT EXISTS enrollments (
-                id SERIAL PRIMARY KEY,
-                student_id INT NOT NULL REFERENCES students(id),
-                course_id INT NOT NULL REFERENCES courses(id),
-                status VARCHAR(20) DEFAULT 'enrolled',
-                grade FLOAT DEFAULT -1,
-                enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                student_id VARCHAR(20) NOT NULL REFERENCES students(id),
+                course_id VARCHAR(20) NOT NULL REFERENCES courses(id),
+                credit INT DEFAULT 0,
                 UNIQUE(student_id, course_id)
             )
         )");
@@ -148,11 +135,21 @@ void Database::createTables() {
         // 教师表
         execute(R"(
             CREATE TABLE IF NOT EXISTS teachers (
-                id SERIAL PRIMARY KEY,
-                employee_id VARCHAR(20) UNIQUE NOT NULL,
+                id VARCHAR(20) PRIMARY KEY,
                 name VARCHAR(50) NOT NULL,
-                department VARCHAR(50),
-                email VARCHAR(100)
+                password VARCHAR(50) DEFAULT '123456',
+                collage VARCHAR(50),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        )");
+
+        execute(R"(
+            CREATE TABLE IF NOT EXISTS secretarys (
+                id VARCHAR(20),
+                name VARCHAR(50) NOT NULL,
+                password VARCHAR(50) DEFAULT '123456',
+                secondaryPassword VARCHAR(50),
+                PRIMARY KEY(id)
             )
         )");
 
@@ -190,16 +187,3 @@ void Database::execute(const std::string& sql) {
     }
 }
 
-// 执行查询
-pqxx::result Database::query(const std::string& sql) {
-    try {
-        pqxx::work txn(getConnection());
-        pqxx::result result = txn.exec(sql);
-        txn.commit();
-        return result;
-    } catch (const std::exception& e) {
-        std::cerr << "查询失败: " << sql << std::endl;
-        std::cerr << "错误: " << e.what() << std::endl;
-        throw;
-    }
-}
