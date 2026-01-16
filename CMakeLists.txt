@@ -7,16 +7,39 @@ set(CMAKE_CXX_MODULE_STD ON)
 
 project(CourseManagement-system LANGUAGES CXX)
 
-# 设置 C++ 标准
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# set(MODULE_LIB_DIR1 /opt/utils/modules)  # 模块库的目录的设置
+set(UI_HEADERS
+    userui.h
+    studentui.h
+    teacherui.h
+    secretaryui.h
+)
+
+set(BROKER_HEADER
+    Database.h
+    studentbroker.h
+    coursebroker.h
+    enrollmentbroker.h
+    teacherbroker.h
+    secretarybroker.h
+    broker.h
+)
+
+set(SERVICE_HEADER
+    ser.student.h
+    ser.secretary.h
+    ser.teacher.h
+)
+source_group("uis-head" FILES ${UI_HEADERS})
+source_group("broker-head" FILES ${BROKER_HEADER})
+source_group("service-head" FILES ${SERVICE_HEADER})
+
 add_executable(CourseManagement-system
     #math.cpp                              # 模块实现单元
     main.cpp
-    Database.h
-    studentbroker.h
+    ${BROKER_HEADER}
+    ${UI_HEADERS}
+    ${SERVICE_HEADER}
 
 
 )
@@ -31,25 +54,22 @@ set(DOMAIN_MODULES
     do.secretary.cppm
 )
 
-set(UI_MODULES
-    ui.cppm
-)
 
-set(SYSTEM_MODULES
-    system.cppm
-)
+source_group("domain-module" FILES ${DOMAIN_MODULES})
 
-source_group("Module Interfaces" FILES ${MODULE_INTERFACE_FILES})
-source_group("domain" FILES ${DOMAIN_MODULES})
-source_group("ui" FILES ${UI_MODULES})
-source_group("system" FILES ${SYSTEM_MODULES})
 
 target_sources(CourseManagement-system  PRIVATE FILE_SET cxx_modules TYPE CXX_MODULES
     BASE_DIRS
         ${CMAKE_CURRENT_SOURCE_DIR}
-        FILES ${MODULE_INTERFACE_FILES} ${DOMAIN_MODULES} ${UI_MODULES} ${SYSTEM_MODULES}
-)
+        FILES ${DOMAIN_MODULES}
+              ${UI_HEADER}
+              ${SYSTEM_MODULES}
+              ${SERVICE_MODULES}
+    )
+
 target_compile_features(CourseManagement-system PRIVATE cxx_std_23)
+
+
 
 target_include_directories(CourseManagement-system PRIVATE
     /usr/include

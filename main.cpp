@@ -1,11 +1,12 @@
 #include "Database.h"
-#include "studentbroker.h"
-import std;
-import ui;
+#include "userui.h"
 
 int main()
 {
     Database db;
+   // db.insertDatas();
+    UserUI ui(db.getConnection());
+    ui.WelcomeMenu();
     return 0;
 }
 
