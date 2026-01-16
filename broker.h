@@ -9,7 +9,8 @@ private:
     std::shared_ptr<pqxx::connection> conn;
 public:
     Broker(std::shared_ptr<pqxx::connection> c);
-    void execute(std::string& sql);           //执行SQL语句
+    template<class... Args>
+    void execute(const std::string& sql, Args&&... args);           //执行SQL语句
     template<class... Args>
     pqxx::result query(const std::string& sql, Args&&... args);     //执行查询并返回结果
     bool isConnected();                               //检查连接状态
@@ -19,10 +20,15 @@ Broker::Broker(std::shared_ptr<pqxx::connection> c):
 
 
 // 执行SQL语句
-void Broker::execute(std::string& sql) {
+template<class... Args>
+void Broker::execute(const std::string& sql, Args&&... args) {
     try {
         pqxx::work txn(*conn);
-        txn.exec(sql);
+        if constexpr (sizeof...(args) == 0) {
+            txn.exec(sql);
+        } else {
+            txn.exec_params(sql, std::forward<Args>(args)...);
+        }
         txn.commit();
     } catch (const std::exception& e) {
         std::cerr << "执行SQL失败: " << sql << std::endl;

@@ -29,7 +29,7 @@ UserUI::~UserUI(){
 
 void UserUI::WelcomeMenu(){
 
-    print("\n=====欢迎进入课程管理系统=====\n");
+    print("=====欢迎进入课程管理系统=====\n");
     print("      1,进入登陆界面\n      2,退出系统\n请选择:");
 
     while(1){
@@ -53,14 +53,15 @@ void UserUI::WelcomeMenu(){
                 print("\n无效输入，请重输:");
         }
 
-        print("\n=====欢迎进入课程管理系统=====\n");
+        print("=====欢迎进入课程管理系统=====\n");
         print("      1,进入登陆界面\n      2,退出系统\n请选择:");
     }
 }
 
 void UserUI::loginMenu(){
     std::cout << "\033[2J\033[H" << std::flush;
-    print("\n====选择登陆方式====\n");
+
+    print("====选择登陆方式====\n");
     print("   1,学生登陆\n   2,教师登陆\n   3,秘书登陆\n请选择:");
     while(1){
         int choose;

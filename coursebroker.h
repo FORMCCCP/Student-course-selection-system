@@ -2,15 +2,14 @@
 
 #include "broker.h"
 import domain;
-
+using std::string;
 
 class Coursebroker: public Broker{
 private:
     std::shared_ptr<pqxx::connection> connection;
 public:
     Coursebroker(std::shared_ptr<pqxx::connection> conn);
-    class Course* returnCourse(string c_id);    //返回课程对象
-
+    class Course* returnCourse(std::string c_id);    //返回课程对象
 };
 
 Coursebroker::Coursebroker(std::shared_ptr<pqxx::connection> conn):
@@ -31,7 +30,7 @@ class Course* Coursebroker::returnCourse(string c_id){
     string grade =result[0][7].as<string>();         //开放年级
     string majored=result[0][8].as<string>();       //所属专业
 
-    Course* cou_ptr = new Course(id,name,credit,capacity,current_capacity,teacherId,session,grade,majored);
+    class Course* cou_ptr = new Course(id,name,credit,capacity,current_capacity,teacherId,session,grade,majored);
     return cou_ptr;
 }
 

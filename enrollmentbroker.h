@@ -10,7 +10,6 @@ class Enrollmentbroker : public Broker{
 private:
     std::shared_ptr<pqxx::connection> connection;
 
-
 public:
     Enrollmentbroker(std::shared_ptr<pqxx::connection> conn);
     std::vector<class Course*> returnObtainCourses(string std_id, Coursebroker& Coubroker);     //返回已经获取的课程

@@ -20,12 +20,13 @@ public:
     void execute(const std::string& sql);                   //执行SQL语句
     void insertDatas();
 private:
+    bool insertJudgment = false;
 
     std::string buildConnectionString(bool includeDbName = true);   // 创建连接字符串
     bool databaseExists();          // 检查数据库是否存在
     void createDatabase();          // 创建数据库
     void connectToDatabase();       // 连接数据库
-    void createTables();                                    //创建选课系统所需的表
+    void createTables();            //创建选课系统所需的表
 };
 
 
@@ -36,12 +37,16 @@ Database::Database() {
         if(!databaseExists()){
             std::print("数据库不存在{}，正在创建...", dbname);
             createDatabase();
+            insertJudgment = true;
         }
 
         connectToDatabase();
-        createTables();
-
-        std::print("初始化完成\n\n\n");
+        if(insertJudgment){
+            createTables();
+            insertDatas();
+            std::print("\n创建数据表成功\n数据表初始化成功\n");
+        }
+        std::print("初始化完成\n\n");
 
     } catch (const std::exception& e) {
         std::cerr << "数据库初始化失败: " << e.what() << std::endl;
@@ -213,13 +218,12 @@ void Database::connectToDatabase() {
     }
 }
 
-
+//插入数据
 void Database::insertDatas(){
     execute(R"(
         INSERT INTO students VALUES
-        ('2024001','Saul','1233455','法律学',0,'大二',1),
-        ('2024003','Goodman','1426387','历史学',0,'大二',1),
-        ('2023002','Mao','19660516','历史学',0,'大三',1);
+        ('2024001','Saul Goodman','1233455','法律学',0,'大二',1),
+        ('2023002','Mao','19660516','历史学',0,'大二',1);
     )");
 
     execute(R"(
@@ -235,8 +239,8 @@ void Database::insertDatas(){
         ('LAW002','宪法学',4,62,0,'t0320',1,'大二','法律学'),
         ('HIS003','世界通史',5,64,0,'t0001',1,'大二','历史学'),
         ('HIS009','中国通史',5,64,0,'t0113',1,'大二','历史学'),
-        ('HIS010','美国历史',5,47,0,'t0001',1,'大三','历史学'),
-        ('HIS015','文化大革命史',5,32,0,'t0027',1,'大三','历史学');
+        ('HIS010','美国历史',5,47,0,'t0001',1,'大二','历史学'),
+        ('HIS015','文化大革命史',5,32,1,'t0027',1,'大二','历史学');
     )");
 
     execute(R"(

@@ -4,7 +4,6 @@
 int main()
 {
     Database db;
-   // db.insertDatas();
     UserUI ui(db.getConnection());
     ui.WelcomeMenu();
     return 0;
