@@ -15,6 +15,8 @@ public:
 Coursebroker::Coursebroker(std::shared_ptr<pqxx::connection> conn):
     Broker(conn),connection(conn){}
 
+
+//返回课程对象
 class Course* Coursebroker::returnCourse(string c_id){
     pqxx::result result = query(
                 R"(SELECT * FROM courses

@@ -16,17 +16,18 @@ private:
 
 public:
     Database();
-    std::shared_ptr<pqxx::connection> getConnection();                      //获取数据库连接
-    void execute(const std::string& sql);                   //执行SQL语句
-    void insertDatas();
+    std::shared_ptr<pqxx::connection> getConnection();              //获取数据库连接
+    void execute(const std::string& sql);                           //执行SQL语句
+    void insertDatas();                                             //插入初始数据
 private:
+    //用于判断是否需要进行表创建和数据初始化的标记
     bool insertJudgment = false;
 
-    std::string buildConnectionString(bool includeDbName = true);   // 创建连接字符串
-    bool databaseExists();          // 检查数据库是否存在
-    void createDatabase();          // 创建数据库
-    void connectToDatabase();       // 连接数据库
-    void createTables();            //创建选课系统所需的表
+    std::string buildConnectionString(bool includeDbName = true);   //创建连接字符串
+    bool databaseExists();                                          //检查数据库是否存在
+    void createDatabase();                                          //创建数据库
+    void connectToDatabase();                                       //连接数据库
+    void createTables();                                            //创建选课系统所需的表
 };
 
 
@@ -41,6 +42,7 @@ Database::Database() {
         }
 
         connectToDatabase();
+
         if(insertJudgment){
             createTables();
             insertDatas();
@@ -173,7 +175,6 @@ void Database::createDatabase(){
         connStr += " dbname=postgres";
 
         pqxx::connection adminConn(connStr);
-
         // 使用非事务对象
         pqxx::nontransaction ntx(adminConn);
 
@@ -181,7 +182,6 @@ void Database::createDatabase(){
                          "ENCODING 'UTF8' "
                          "LC_COLLATE 'en_US.UTF-8' "
                          "LC_CTYPE 'en_US.UTF-8'";
-
         // 执行创建数据库命令
         ntx.exec(sql);
 
@@ -202,8 +202,7 @@ void Database::connectToDatabase() {
         connection = std::make_shared<pqxx::connection>(connStr);
 
         if (connection->is_open()) {
-            std::print("成功连接到数据库: {}\n",
-                      connection->dbname());
+            std::print("成功连接到数据库: {}\n",connection->dbname());
         } else {
             throw std::runtime_error("无法连接到数据库");
         }
@@ -220,6 +219,7 @@ void Database::connectToDatabase() {
 
 //插入数据
 void Database::insertDatas(){
+    try{
     execute(R"(
         INSERT INTO students VALUES
         ('2024001','Saul Goodman','1233455','法律学',0,'大二',1),
@@ -237,15 +237,24 @@ void Database::insertDatas(){
     execute(R"(
         INSERT INTO courses VALUES
         ('LAW002','宪法学',4,62,0,'t0320',1,'大二','法律学'),
+        ('LAW003','民法学',4,58,0,'t0320',1,'大二','法律学'),
         ('HIS003','世界通史',5,64,0,'t0001',1,'大二','历史学'),
         ('HIS009','中国通史',5,64,0,'t0113',1,'大二','历史学'),
-        ('HIS010','美国历史',5,47,0,'t0001',1,'大二','历史学'),
-        ('HIS015','文化大革命史',5,32,1,'t0027',1,'大二','历史学');
+        ('HIS010','美国史',5,47,0,'t0001',1,'大二','历史学'),
+        ('HIS015','基督教史',5,32,1,'t0027',1,'大二','历史学');
     )");
 
     execute(R"(
         INSERT INTO enrollments VALUES
         ('2023002','HIS015',0);
     )");
+
+    execute(R"(
+        INSERT INTO secretarys VALUES
+        ('90078','TTT','12345','123');
+        )");
+    }catch(const std::exception& e){
+        std::cerr<<"数据初始化失败"<< e.what() <<std::endl;
+    }
 
 }

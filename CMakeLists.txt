@@ -50,7 +50,7 @@ set(DOMAIN_MODULES
     do.student.cppm
     do.teacher.cppm
     do.course.cppm
-    do.enroll.cppm
+
     do.secretary.cppm
 )
 

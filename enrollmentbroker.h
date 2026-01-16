@@ -19,7 +19,7 @@ Enrollmentbroker::Enrollmentbroker(std::shared_ptr<pqxx::connection> conn):
     Broker(conn),connection(conn){}
 
 
-
+//返回已经获取的课程
 std::vector<class Course*> Enrollmentbroker::returnObtainCourses(string std_id, Coursebroker& Coubroker){
     pqxx::result result = query(
                 R"(SELECT course_id FROM enrollments

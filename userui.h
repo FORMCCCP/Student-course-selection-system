@@ -73,8 +73,15 @@ void UserUI::loginMenu(){
                 StuUi->Ser_student();
             }
             break;
-            case 2:
-            case 3:
+            case 2:{
+                std::println();
+                std::unique_ptr<class TeacherUI> TeaUi = std::make_unique<class TeacherUI>(connection);
+                TeaUi->Ser_teacher();
+            }
+            break;
+            case 3:{
+
+            }
             default:
                 print("无效输入，请重输:");
                 continue;

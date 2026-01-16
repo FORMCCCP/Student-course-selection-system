@@ -8,23 +8,22 @@ using std::string;
 
 class Studentbroker: public Broker{
 private:
-    std::shared_ptr<pqxx::connection> connection;
 
 public:
-    Studentbroker(std::shared_ptr<pqxx::connection> conn);  //构造函数
-    bool handleLogin(string id, string password);           //验证账号密码
-    class Student* returnStudent(string id);                //返回学生对象
-    pqxx::result returnAvailableCoursesid(string id);       //返回可选择课程的结果
-    string returnCourseName(string c_id, Coursebroker& Coubroker);                   //返回课程的名字
+    Studentbroker(std::shared_ptr<pqxx::connection> conn);                                      //构造函数
+    bool handleLogin(string id, string password);                                               //验证账号密码
+    class Student* returnStudent(string id);                                                    //返回学生对象
+    pqxx::result returnAvailableCoursesid(string id);                                           //返回可选择课程的结果
+    string returnCourseName(string c_id, Coursebroker& Coubroker);                              //返回课程的名字
     std::vector<class Course*> checkAvailableCourse(const string s_id,Coursebroker& Coubroker); //获取可选择课程
     void chooseCourseOperation(string c_id, string s_id, Coursebroker& Coubroker);              //选择课程的操作
     void exitCourseOperatrion(string c_id, string s_id, Coursebroker& Coubroker);               //退出课程的操作
-    int calculateTotalGrade(string s_id, Coursebroker& Coubroker);                                                       //计算总成绩
+    int calculateTotalGrade(string s_id, Coursebroker& Coubroker);                              //计算总成绩
 
 };
 
 Studentbroker::Studentbroker(std::shared_ptr<pqxx::connection> conn):
-    Broker(conn),connection(conn){}
+    Broker(conn){}
 
 //验证账号和密码
 bool Studentbroker::handleLogin(string id, string password){
@@ -49,7 +48,7 @@ bool Studentbroker::handleLogin(string id, string password){
         return false;
         }
 }
-
+//返回学生对象
 class Student* Studentbroker::returnStudent(string id){
     pqxx::result result = query(
                 R"(SELECT id, name, password, major, total_credits,
@@ -115,6 +114,10 @@ std::vector<class Course*> Studentbroker::checkAvailableCourse(const string s_id
 //选择课程的操作
 void Studentbroker::chooseCourseOperation(string c_id, string s_id, Coursebroker& Coubroker){
     pqxx::result result = returnAvailableCoursesid(s_id);
+    if(result.empty()){
+        std::print("你没有可选择的课程\n");
+        return;
+    }
     for(int i =0;i<result.size();++i){
         string cid = result[i][0].as<string>();
         if(c_id == cid){
@@ -124,7 +127,7 @@ void Studentbroker::chooseCourseOperation(string c_id, string s_id, Coursebroker
             return;
         }
     }
-    std::print("选课失败，课程无法选择(不在你的可选范围内/人数已满)或课程ID不存在\n");
+    std::print("输入ID错误,选课失败\n");
 }
 
 
@@ -147,7 +150,6 @@ int Studentbroker::calculateTotalGrade(string s_id, Coursebroker& Coubroker){
     pqxx::result result = query(
                 R"(SELECT course_id, credit FROM enrollments WHERE student_id=$1)",s_id);
     if(result.size() == 0){
-        std::print("你未选择相应课程\n");
         return -1;
     }
     int totalgrade = 0;
@@ -157,5 +159,6 @@ int Studentbroker::calculateTotalGrade(string s_id, Coursebroker& Coubroker){
         std::print("{}的成绩:{}\n",returnCourseName(cou,Coubroker), g);
         totalgrade += g;
     }
+    execute("UPDATE students SET total_credits=$1 WHERE student_id=$2",totalgrade, s_id);
     return totalgrade;
 }

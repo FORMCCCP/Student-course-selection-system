@@ -9,11 +9,12 @@ private:
     std::shared_ptr<pqxx::connection> conn;
 public:
     Broker(std::shared_ptr<pqxx::connection> c);
+
     template<class... Args>
     void execute(const std::string& sql, Args&&... args);           //执行SQL语句
     template<class... Args>
     pqxx::result query(const std::string& sql, Args&&... args);     //执行查询并返回结果
-    bool isConnected();                               //检查连接状态
+    bool isConnected();                                             //检查连接状态
 };
 Broker::Broker(std::shared_ptr<pqxx::connection> c):
     conn(c){}

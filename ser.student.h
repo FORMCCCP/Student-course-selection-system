@@ -11,19 +11,17 @@ using std::print;
 
 class Serstudent{
 private:
-    std::shared_ptr<pqxx::connection> connection;
-    Studentbroker Stubroker;
-    Coursebroker Coubroker;
-    Enrollmentbroker enbroker;
+    Studentbroker Stubroker;        //学生服务层
+    Coursebroker Coubroker;         //课程服务层
+    Enrollmentbroker enbroker;      //课程选择服务层
 
-    string id;
-    string password;
+
     class Student* student;
 
     std::vector<class Course*> obtainedCourses;   //已经获取课程
-    bool needRefreshObtained = true;              //刷新记号
+    bool needRefreshObtained = true;              //刷新缓存记号
     std::vector<class Course*> unobtainedCourses; //未获取但可选择课程
-    bool needRefreshunobtained = true;
+    bool needRefreshunobtained = true;            //刷新缓存记号
 
 public:
     Serstudent(std::shared_ptr<pqxx::connection> conn);
@@ -39,14 +37,15 @@ public:
     void chooseCourse(string id);           //选择课程
     void exitCourse(string id);             //退出课程
 
-    void viewTotalGrade(string id);    //计算成绩
+    void viewTotalGrade(string id);         //计算成绩
 };
 
 Serstudent::Serstudent(std::shared_ptr<pqxx::connection> conn):
-    connection(conn), Stubroker(conn), Coubroker(conn), enbroker(conn){}
+     Stubroker(conn), Coubroker(conn), enbroker(conn){}
 
 //处理登陆
 bool Serstudent::login(){
+    string id, password;
     print("输入ID:");
     std::cin>>id;
     print("输入密码:");
@@ -82,6 +81,7 @@ void Serstudent::viewObtaninedCourses(string id){
     ObtainedCourses(id);
     if(obtainedCourses.empty()){
         print("你没有选择课程\n");
+        print("=========\n");
         return;
     }
     for(class Course* c: obtainedCourses){
@@ -103,6 +103,7 @@ void Serstudent::AvailableCourses(string id){
     needRefreshunobtained = false;
     return;
 }
+
 //查看可以选择的课程
 void Serstudent::viewAvailableCourses(string id){
     AvailableCourses(id);
@@ -141,6 +142,7 @@ void Serstudent::exitCourse(string s_id){
 void Serstudent::viewTotalGrade(string s_id){
     int grade = Stubroker.calculateTotalGrade(s_id, Coubroker);
     if(grade == -1){
+        print("你未选择相应课程\n");
         return;
     }else{
         print("\n你的总成绩: {}\n",grade);
