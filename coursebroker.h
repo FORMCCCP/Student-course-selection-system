@@ -10,6 +10,7 @@ private:
 public:
     Coursebroker(std::shared_ptr<pqxx::connection> conn);
     class Course* returnCourse(std::string c_id);    //返回课程对象
+    string returnCourseName(string c_id);
 };
 
 Coursebroker::Coursebroker(std::shared_ptr<pqxx::connection> conn):
@@ -36,3 +37,9 @@ class Course* Coursebroker::returnCourse(string c_id){
     return cou_ptr;
 }
 
+string Coursebroker::returnCourseName(string c_id){
+    class Course* course = returnCourse(c_id);
+    string name = course->getName();
+    delete course;
+    return name;
+}

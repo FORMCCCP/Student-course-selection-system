@@ -7,19 +7,16 @@ import domain;
 using std::string;
 
 class Studentbroker: public Broker{
-private:
-
 public:
     Studentbroker(std::shared_ptr<pqxx::connection> conn);                                      //构造函数
     bool handleLogin(string id, string password);                                               //验证账号密码
     class Student* returnStudent(string id);                                                    //返回学生对象
     pqxx::result returnAvailableCoursesid(string id);                                           //返回可选择课程的结果
-    string returnCourseName(string c_id, Coursebroker& Coubroker);                              //返回课程的名字
+    string returnStudentName(string s_id);                                                             //返回学生名字
     std::vector<class Course*> checkAvailableCourse(const string s_id,Coursebroker& Coubroker); //获取可选择课程
     void chooseCourseOperation(string c_id, string s_id, Coursebroker& Coubroker);              //选择课程的操作
     void exitCourseOperatrion(string c_id, string s_id, Coursebroker& Coubroker);               //退出课程的操作
-    int calculateTotalGrade(string s_id, Coursebroker& Coubroker);                              //计算总成绩
-
+    int calculateTotalGrade(string s_id, Coursebroker& Coubroker);                              //计算总成绩       
 };
 
 Studentbroker::Studentbroker(std::shared_ptr<pqxx::connection> conn):
@@ -48,6 +45,15 @@ bool Studentbroker::handleLogin(string id, string password){
         return false;
         }
 }
+
+//返回学生名字
+string Studentbroker::returnStudentName(string s_id){
+    class Student* student = returnStudent(s_id);
+    string name = student->getName();
+    delete student;
+    return name;
+}
+
 //返回学生对象
 class Student* Studentbroker::returnStudent(string id){
     pqxx::result result = query(
@@ -67,11 +73,7 @@ class Student* Studentbroker::returnStudent(string id){
                                          s_credits,current_session,grade);
     return stu_ptr;
 }
-//返回课程名字
-string Studentbroker::returnCourseName(string c_id, Coursebroker& Coubroker){
-    class Course* course = Coubroker.returnCourse(c_id);
-    return course->getName();
-}
+
 
 //返回可选择课程的结果
 pqxx::result Studentbroker::returnAvailableCoursesid(string id){
@@ -123,7 +125,7 @@ void Studentbroker::chooseCourseOperation(string c_id, string s_id, Coursebroker
         if(c_id == cid){
             execute("INSERT INTO enrollments VALUES($1,$2,$3)",s_id,c_id,0);
             execute("UPDATE courses SET current_capacity = current_capacity + 1 WHERE id = $1", c_id);
-            std::print("选取课程《{}》成功.\n\n",returnCourseName(c_id,Coubroker));
+            std::print("选取课程《{}》成功.\n\n",Coubroker.returnCourseName(c_id));
             return;
         }
     }
@@ -141,7 +143,7 @@ void Studentbroker::exitCourseOperatrion(string c_id, string s_id, Coursebroker&
     }else{
         execute("DELETE FROM enrollments WHERE student_id=$1 AND course_id=$2",s_id,c_id);
         execute("UPDATE courses SET current_capacity = current_capacity - 1 WHERE id = $1", c_id);
-        std::print("退出课程《{}》成功.\n\n",returnCourseName(c_id,Coubroker));
+        std::print("退出课程《{}》成功.\n\n",Coubroker.returnCourseName(c_id));
     }
 }
 
@@ -156,8 +158,12 @@ int Studentbroker::calculateTotalGrade(string s_id, Coursebroker& Coubroker){
     for(int i =0;i<result.size();++i){
         int g = result[i][1].as<int>();
         string cou = result[i][0].as<string>();
-        std::print("{}的成绩:{}\n",returnCourseName(cou,Coubroker), g);
-        totalgrade += g;
+        if(g == -1){
+            std::print("{}还未被评分\n",Coubroker.returnCourseName(cou));
+        }else{
+            std::print("{}的成绩:{}\n",Coubroker.returnCourseName(cou), g);
+            totalgrade += g;
+        }
     }
     execute("UPDATE students SET total_credits=$1 WHERE student_id=$2",totalgrade, s_id);
     return totalgrade;

@@ -5,6 +5,7 @@ import domain;
 #include "teacherbroker.h"
 #include "coursebroker.h"
 #include "enrollmentbroker.h"
+#include "studentbroker.h"
 
 
 class Serteacher{
@@ -12,6 +13,7 @@ private:
     Coursebroker Coubroker;         //课程服务层
     Enrollmentbroker enbroker;      //课程选择服务层
     Teacherbroker teabroker;        //教师服务层
+    Studentbroker Stubroker;        //学生服务层
 
     class Teacher* teacher;
 
@@ -27,4 +29,4 @@ public:
 };
 
 Serteacher::Serteacher(std::shared_ptr<pqxx::connection> conn):
-    Coubroker(conn), enbroker(conn), teabroker(conn){}
+    Coubroker(conn), enbroker(conn), teabroker(conn),Stubroker(conn){}

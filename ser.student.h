@@ -63,7 +63,7 @@ class Student* Serstudent::getStudent(){
 }
 
 //获得已经选择的课程
-void Serstudent::ObtainedCourses(string id){
+void Serstudent::ObtainedCourses(string s_id){
     if (!needRefreshObtained && obtainedCourses.size() != 0) {
         return;
     }
@@ -71,14 +71,14 @@ void Serstudent::ObtainedCourses(string id){
         delete course;
     }
     obtainedCourses.clear();
-    std::vector<class Course*> courses = enbroker.returnObtainCourses(id, Coubroker);
+    std::vector<class Course*> courses = enbroker.returnObtainCourses(s_id, Coubroker);
     obtainedCourses = courses;
     needRefreshObtained = false;
     return;
 }
 //查看我的课程
-void Serstudent::viewObtaninedCourses(string id){
-    ObtainedCourses(id);
+void Serstudent::viewObtaninedCourses(string s_id){
+    ObtainedCourses(s_id);
     if(obtainedCourses.empty()){
         print("你没有选择课程\n");
         print("=========\n");
@@ -93,12 +93,12 @@ void Serstudent::viewObtaninedCourses(string id){
     }
 }
 //获得可以选择的课程
-void Serstudent::AvailableCourses(string id){
+void Serstudent::AvailableCourses(string s_id){
     if(!needRefreshunobtained && unobtainedCourses.size() != 0)return;
     for (Course* course : unobtainedCourses) {
         delete course;
     }
-    std::vector<class Course*> courses = Stubroker.checkAvailableCourse(id, Coubroker);
+    std::vector<class Course*> courses = Stubroker.checkAvailableCourse(s_id, Coubroker);
     unobtainedCourses = courses;
     needRefreshunobtained = false;
     return;

@@ -129,7 +129,7 @@ void Database::createTables() {
             CREATE TABLE IF NOT EXISTS enrollments (
                 student_id VARCHAR(20) NOT NULL REFERENCES students(id),
                 course_id VARCHAR(20) NOT NULL REFERENCES courses(id),
-                credit INT DEFAULT 0
+                credit INT DEFAULT -1
             )
         )");
 
@@ -246,7 +246,7 @@ void Database::insertDatas(){
 
     execute(R"(
         INSERT INTO enrollments VALUES
-        ('2023002','HIS015',0);
+        ('2023002','HIS015',-1);
     )");
 
     execute(R"(

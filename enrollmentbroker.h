@@ -11,7 +11,7 @@ private:
     std::shared_ptr<pqxx::connection> connection;
 
 public:
-    Enrollmentbroker(std::shared_ptr<pqxx::connection> conn);
+    Enrollmentbroker(std::shared_ptr<pqxx::connection> conn);                                   //构造函数
     std::vector<class Course*> returnObtainCourses(string std_id, Coursebroker& Coubroker);     //返回已经获取的课程
 };
 
