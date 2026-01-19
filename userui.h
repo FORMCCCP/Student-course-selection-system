@@ -80,8 +80,11 @@ void UserUI::loginMenu(){
             }
             break;
             case 3:{
-
+                std::println();
+                std::unique_ptr<class SecretaryUI> SecUi = std::make_unique<class SecretaryUI>(connection);
+                SecUi->Ser_secretary();
             }
+            break;
             default:
                 print("无效输入，请重输:");
                 continue;

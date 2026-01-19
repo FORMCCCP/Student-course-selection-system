@@ -72,7 +72,14 @@ target_compile_features(CourseManagement-system PRIVATE cxx_std_23)
 
 
 target_include_directories(CourseManagement-system PRIVATE
-    /usr/include
+    /usr/local/include
+)
+
+target_link_directories(CourseManagement-system PRIVATE
+    /usr/local/lib)
+target_link_libraries(CourseManagement-system PRIVATE
+    pqxx
+    pq
 )
 
 if(PQXX_LIB AND PQ_LIB)
