@@ -1,3 +1,6 @@
+//表现层：教师UI
+//处理教师登陆和功能选择
+
 module;
 #include "pqxx/pqxx"
 
@@ -52,6 +55,11 @@ void TeacherUI::Ser_teacher()
         print("请选择功能:");
         int choose;
         std::cin >> choose;
+        if (std::cin.fail()) {
+            print("无效输入，请输入数字\n");
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            continue;}
         switch(choose)
         {
         case 1:
@@ -65,7 +73,6 @@ void TeacherUI::Ser_teacher()
             break;
         case 2:
             tea.evaluateGrade(tea.getTeacher()->getId());
-            print("=========\n");
             waitForEnter();
             clearScreen();
             showTeacherMenu(tea);

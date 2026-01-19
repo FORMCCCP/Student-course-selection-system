@@ -1,3 +1,6 @@
+//服务层/逻辑应用层：秘书处理
+//处理秘书相关的功能业务
+
 module;
 #include "pqxx/pqxx"
 
@@ -12,7 +15,7 @@ using std::print;
 
 export class SerSecretary{
 private:
-    Coursebroker coubroker;
+    Coursebroker coubroker;         //课程数据层
     Secretarybroker secbroker;      //秘书数据层
 
     class Secretary* secretary;

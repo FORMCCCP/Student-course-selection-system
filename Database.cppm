@@ -1,3 +1,5 @@
+//数据层：数据库控制
+//负责数据库相关功能
 module;
 #include "pqxx/pqxx"
 
@@ -230,6 +232,7 @@ void Database::insertDatas(){
 
     execute(R"(
         INSERT INTO teachers VALUES
+        ('t0000','t0000','t0000','t0000'),
         ('t0001','Mr.Q','13478','历史学'),
         ('t0320','Mr.F','26915','法律学'),
         ('t0113','Mr.C','33462','历史学'),
@@ -248,8 +251,8 @@ void Database::insertDatas(){
 
     execute(R"(
         INSERT INTO enrollments VALUES
-        ('2023002','HIS015',-1);
-        ('2023002','HIS010',3);
+        ('2023002','HIS015',-1),
+        ('2023002','HIS010',87);
     )");
 
     execute(R"(

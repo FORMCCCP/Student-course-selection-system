@@ -1,3 +1,5 @@
+//表现层：秘书UI
+//处理秘书登陆和功能选择，秘书选择功能时都要经过二级密码验证
 module;
 #include "pqxx/pqxx"
 
@@ -48,6 +50,11 @@ void SecretaryUI::Ser_secretary(){
         print("请选择功能:");
         int choose;
         std::cin>>choose;
+        if (std::cin.fail()) {
+            print("无效输入，请输入数字\n");
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            continue;}
         switch(choose){
         case 1:
             std::println();

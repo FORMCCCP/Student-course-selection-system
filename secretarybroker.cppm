@@ -1,3 +1,5 @@
+//数据层：秘书层
+//从数据库提取秘书相关数据
 module;
 #include "pqxx/pqxx"
 
@@ -214,7 +216,7 @@ void Secretarybroker::addtheCourse(string c_id){
     }
     print("设置开设专业:");
     std::cin>>c_major;
-    execute("INSERT INTO courses VALUES($1,$2,$3,0 ,‘t0000’,$4,$5,$6,$7)",
+    execute("INSERT INTO courses VALUES($1,$2,$3,$4, 0,'t0000',$5,$6,$7)",
             c_id,c_name,c_credits,c_capacity,c_session,c_grade,c_major);
     print("添加成功\n");
 }

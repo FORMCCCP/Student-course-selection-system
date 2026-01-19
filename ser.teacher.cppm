@@ -1,3 +1,5 @@
+//服务层/逻辑应用层：教师处理
+//处理教师相关的功能业务
 module;
 #include "pqxx/pqxx"
 
@@ -29,7 +31,6 @@ public:
     class Teacher* getTeacher();
 
     void viewTeachingCourses(string id);        //查看教授的课程
-
     void evaluateGrade(string id);              //为学生的课程打分
 };
 
@@ -82,10 +83,9 @@ void Serteacher::viewTeachingCourses(string id)
 
 void Serteacher::evaluateGrade(string id)
 {
-    print("输入课程ID:");
+    print("\n输入课程ID:");
     string c_id;
     std::cin>>c_id;
     teabroker.showCourseAndStudent(c_id,id, Stubroker);
-    teabroker.evaluateGradeToStudent(id);
 }
 

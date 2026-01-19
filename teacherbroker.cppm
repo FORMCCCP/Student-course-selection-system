@@ -1,3 +1,6 @@
+//数据层：教师层
+//从数据库提取教师相关数据
+
 module;
 #include "pqxx/pqxx"
 
@@ -117,22 +120,26 @@ void Teacherbroker::showCourseAndStudent(string c_id, string t_id,Studentbroker&
         }
     }
     evaluateGradeToStudent(c_id);
-
+    std::print("\n");
 }
 
 //为学生评分
 void Teacherbroker::evaluateGradeToStudent(string c_id){
     std::vector<string> sids;
     pqxx::result result = query(
-            R"(SELECT student_id FROM enrollment WHERE course_id=$1)",c_id);
+            R"(SELECT student_id FROM enrollments WHERE course_id=$1)",c_id);
     for(int i=0; i<result.size();++i){
         string sid = result[i][0].as<string>();
         sids.push_back(sid);
         }
-    while(1){
+    bool key = true;
+    while(key){
         string s_id;
-        std::print("选择学生(输入ID):");
+        std::print("选择学生(输入ID-输入0退出):");
         std::cin >> s_id;
+        if(s_id == "0"){
+            return;
+        }
         int count = 0;
         for(string& s: sids){
             if(s == s_id){
@@ -149,12 +156,16 @@ void Teacherbroker::evaluateGradeToStudent(string c_id){
         int c;
         std::cin >> c;
         if(c>=0 && c<=100){
+            try{
+                key = false;
+                execute("UPDATE enrollments SET credit = $1 WHERE course_id = $2 AND student_id = $3",c,c_id,s_id);
+            }catch(const std::exception& e){
+                    std::cerr<<"评分失败"<<e.what()<<std::endl;
+                    continue;
+                }
             std::print("评分成功\n");
-            execute("UPDATE enrollments SET credit = $1 WHERE id = $2",c,c_id);
-            return;
         }else{
             std::print("无效分数\n");
-            continue;
         }
     }
 }

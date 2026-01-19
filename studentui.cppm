@@ -1,3 +1,6 @@
+//表现层：学生UI
+//处理学生登陆和功能选择
+
 module;
 #include "pqxx/pqxx"
 
@@ -54,6 +57,11 @@ void StudentUI::Ser_student(){
         print("请选择功能:");
         int choose;
         std::cin >> choose;
+        if (std::cin.fail()) {
+            print("无效输入，请输入数字\n");
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            continue;}
         switch(choose){
         case 1:
             print("\n以下是你可以选择的课程:\n");

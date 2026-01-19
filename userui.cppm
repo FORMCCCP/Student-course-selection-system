@@ -1,3 +1,6 @@
+//表现层：总UI
+//负责登陆选择和退出系统的功能
+
 module;
 #include "pqxx/pqxx"
 
@@ -68,6 +71,11 @@ void UserUI::loginMenu(){
     while(1){
         int choose;
         std::cin >> choose;
+        if (std::cin.fail()) {
+            print("无效输入，请输入数字\n");
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            continue;}
         switch(choose){
             case 1:{
                 std::println();

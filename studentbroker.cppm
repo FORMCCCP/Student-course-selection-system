@@ -1,3 +1,5 @@
+//数据层：学生层
+//从数据库提取学生相关数据
 module;
 #include "pqxx/pqxx"
 
@@ -127,7 +129,7 @@ void Studentbroker::chooseCourseOperation(string c_id, string s_id, Coursebroker
     for(int i =0;i<result.size();++i){
         string cid = result[i][0].as<string>();
         if(c_id == cid){
-            execute("INSERT INTO enrollments VALUES($1,$2,$3)",s_id,c_id,0);
+            execute("INSERT INTO enrollments VALUES($1,$2,$3)",s_id,c_id,-1);
             execute("UPDATE courses SET current_capacity = current_capacity + 1 WHERE id = $1", c_id);
             std::print("选取课程《{}》成功.\n\n",Coubroker.returnCourseName(c_id));
             return;
@@ -169,6 +171,6 @@ int Studentbroker::calculateTotalGrade(string s_id, Coursebroker& Coubroker){
             totalgrade += g;
         }
     }
-    execute("UPDATE students SET total_credits=$1 WHERE student_id=$2",totalgrade, s_id);
+    execute("UPDATE students SET total_credits=$1 WHERE id=$2",totalgrade, s_id);
     return totalgrade;
 }

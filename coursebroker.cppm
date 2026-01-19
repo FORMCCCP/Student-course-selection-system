@@ -1,3 +1,5 @@
+//数据层：课程层
+//从数据库提取课程相关数据
 module;
 #include "pqxx/pqxx"
 
