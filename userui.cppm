@@ -1,14 +1,16 @@
-#pragma once
+module;
+#include "pqxx/pqxx"
 
+export module userui;
 import std;
-#include <pqxx/pqxx>
-#include "studentui.h"
-#include "secretaryui.h"
-#include "teacherui.h"
+
+import studentui;
+import secretaryui;
+import teacherui;
 
 using std::print;
 
-class UserUI {
+export class UserUI {
 private:
     std::shared_ptr<pqxx::connection> connection;
 

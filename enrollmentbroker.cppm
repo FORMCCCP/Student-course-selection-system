@@ -1,12 +1,16 @@
-#pragma once
+module;
+#include "pqxx/pqxx"
 
-#include "broker.h"
-#include "coursebroker.h"
+
+export module enrollmentbroker;
+import std;
+import broker;
+import coursebroker;
 import domain;
 
 using std::string;
 
-class Enrollmentbroker : public Broker{
+export class Enrollmentbroker : public Broker{
 private:
     std::shared_ptr<pqxx::connection> connection;
 

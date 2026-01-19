@@ -1,13 +1,16 @@
-#pragma once
+module;
+#include "pqxx/pqxx"
 
-#include "broker.h"
-#include "coursebroker.h"
-#include "studentbroker.h"
+export module teacherbroker;
+
+import broker;
+import coursebroker;
+import studentbroker;
 import domain;
-
+import std;
 using std::string;
 
-class Teacherbroker: public Broker{
+export class Teacherbroker: public Broker{
 public:
     Teacherbroker(std::shared_ptr<pqxx::connection> conn);
 
@@ -16,7 +19,7 @@ public:
     pqxx::result returnTeachingCoursesid(string id);                                    //返回教授课程的结果
     std::vector<class Course*> obtainTeachingCourse(string id,Coursebroker& Coubroker); //获取教授课程
     void showCourseAndStudent(string c_id, string t_id,Studentbroker& Stubroker);       //展示某课程的学生及学分
-    void evaluateGradeToStudent(std::vector<string> sids, string c_id);                 //为学生评分
+    void evaluateGradeToStudent(string c_id);                 //为学生评分
 };
 Teacherbroker::Teacherbroker(std::shared_ptr<pqxx::connection> conn):
     Broker(conn){}
@@ -49,7 +52,7 @@ bool Teacherbroker::handleLogin(string id, string password){
 //返回教师对象
 class Teacher* Teacherbroker::returnTeacher(string t_id){
     pqxx::result result = query(
-                R"(SELECT id, name, passord, majored FROM teachers
+                R"(SELECT id, name, password, majored FROM teachers
                     WHERE id=$1)",t_id);
     string tid = result[0][0].as<string>();
     string tname = result[0][1].as<string>();
@@ -89,15 +92,19 @@ std::vector<class Course*> Teacherbroker::obtainTeachingCourse(string t_id,Cours
 void Teacherbroker::showCourseAndStudent(string c_id, string t_id,Studentbroker& Stubroker){
     pqxx::result result = query(
                 R"(SELECT e.student_id, e.credit FROM enrollments e
-                    WHERE  e.course_id IN (SELECT id FROM courses WHERE teacher_id = $2)
+                    WHERE  e.course_id IN (SELECT id FROM courses WHERE teacher_id = $1)
                     AND e.course_id = $2
-                    )", c_id, t_id);
+                    )", t_id,c_id);
     if(result.empty()){
         std::print("无法找到该课程.");
         return;
     }
     std::vector<string> s_ids;
     std::vector<int> credits;
+    if(result.size() ==0){
+        std::print("该课程目前无学生\n");
+        return;
+    }
     for(int i=0;i<result.size();++i){
         string sid = result[i][0].as<string>();
         s_ids.push_back(sid);
@@ -109,12 +116,19 @@ void Teacherbroker::showCourseAndStudent(string c_id, string t_id,Studentbroker&
             print("{}  {}  暂未评分\n",sid,Stubroker.returnStudentName(sid));
         }
     }
-    evaluateGradeToStudent(s_ids, c_id);
+    evaluateGradeToStudent(c_id);
 
 }
 
 //为学生评分
-void Teacherbroker::evaluateGradeToStudent(std::vector<string> sids,string c_id){
+void Teacherbroker::evaluateGradeToStudent(string c_id){
+    std::vector<string> sids;
+    pqxx::result result = query(
+            R"(SELECT student_id FROM enrollment WHERE course_id=$1)",c_id);
+    for(int i=0; i<result.size();++i){
+        string sid = result[i][0].as<string>();
+        sids.push_back(sid);
+        }
     while(1){
         string s_id;
         std::print("选择学生(输入ID):");

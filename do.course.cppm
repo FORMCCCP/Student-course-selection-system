@@ -27,7 +27,7 @@ public:
     string getTeacherid();
     string getSession();
     string getGrade();
-
+    string getMajor();
 };
 
 Course::Course(string id,string name,short credit,int cap,int cu_cap,string teaID,int ses,
@@ -68,4 +68,7 @@ string Course::getSession(){
 }
 string Course::getGrade(){
     return std::format("{}",c_grade);
+}
+string Course::getMajor(){
+    return std::format("{}",majored);
 }

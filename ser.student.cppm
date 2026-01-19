@@ -1,15 +1,17 @@
-#pragma once
+module;
+#include "pqxx/pqxx"
 
+export module ser.student;
+import std;
 import domain;
-#include <pqxx/pqxx>
-#include "studentbroker.h"
-#include "coursebroker.h"
-#include "enrollmentbroker.h"
+import studentbroker;
+import coursebroker;
+import enrollmentbroker;
 
 using std::string;
 using std::print;
 
-class Serstudent{
+export class Serstudent{
 private:
     Studentbroker Stubroker;        //学生服务层
     Coursebroker Coubroker;         //课程服务层

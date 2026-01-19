@@ -1,12 +1,16 @@
-#pragma once
+module;
+#include "pqxx/pqxx"
 
-#include "broker.h"
-#include "coursebroker.h"
+
+export module studentbroker;
+import std;
+import broker;
+import coursebroker;
 import domain;
 
 using std::string;
 
-class Studentbroker: public Broker{
+export class Studentbroker: public Broker{
 public:
     Studentbroker(std::shared_ptr<pqxx::connection> conn);                                      //构造函数
     bool handleLogin(string id, string password);                                               //验证账号密码
@@ -16,7 +20,7 @@ public:
     std::vector<class Course*> checkAvailableCourse(const string s_id,Coursebroker& Coubroker); //获取可选择课程
     void chooseCourseOperation(string c_id, string s_id, Coursebroker& Coubroker);              //选择课程的操作
     void exitCourseOperatrion(string c_id, string s_id, Coursebroker& Coubroker);               //退出课程的操作
-    int calculateTotalGrade(string s_id, Coursebroker& Coubroker);                              //计算总成绩       
+    int calculateTotalGrade(string s_id, Coursebroker& Coubroker);                              //计算总成绩
 };
 
 Studentbroker::Studentbroker(std::shared_ptr<pqxx::connection> conn):

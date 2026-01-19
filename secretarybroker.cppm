@@ -1,11 +1,17 @@
-#pragma once
+module;
+#include "pqxx/pqxx"
 
-#include "broker.h"
+
+export module secretarybroker;
+import std;
+import broker;
 import domain;
+import coursebroker;
 
 using std::string;
+using std::print;
 
-class Secretarybroker : public Broker{
+export class Secretarybroker : public Broker{
 public:
     Secretarybroker(std::shared_ptr<pqxx::connection> conn);
 
@@ -25,7 +31,7 @@ public:
     void dedeletheCourse(string c_id);                     //删除课程
 
     void showCourseAndTeacher();                           //查看课程的教师
-    void changeCT();                                       //修改课程的教师
+    void changeCT(Coursebroker& c);                                       //修改课程的教师
 };
 
 Secretarybroker::Secretarybroker(std::shared_ptr<pqxx::connection> conn):
@@ -228,16 +234,18 @@ void Secretarybroker::showCourseAndTeacher(){
         string t_id =result[i][2].as<string>();
         string major =result[i][3].as<string>();
         print("{} : {}\n",c_name,c_id);
-        if(t_id == "t0001"){
-            print("教师:未分配  专业:{}\n",t_id,major);
+        print("所属专业: {}\n",major);
+        if(t_id == "t0000"){
+            print("教师:未分配\n",t_id);
         }else {
-            print("教师:{} 专业:{}\n",t_id, major);
+            print("教师:{}\n",t_id);
         }
+        print("\n");
     }
 }
 
 //修改课程的老师
-void Secretarybroker::changeCT(){
+void Secretarybroker::changeCT(Coursebroker& c){
     string c_id;
     while(1){
         print("输入修改的课程:");
@@ -254,12 +262,19 @@ void Secretarybroker::changeCT(){
     while(1){
         print("输入修改后的老师ID:");
         std::cin>>t_id;
-        pqxx::result result = query("SELECT * FROM teachers WHERE id=$1",t_id);
+        pqxx::result result = query("SELECT majored FROM teachers WHERE id=$1",t_id);
         if(result.empty()){
             print("不存在老师\n");
             continue;
         }else{
-            break;
+            string t_m = result[0][0].as<string>();
+            string c_m = c.returnCourseMajor(c_id);
+            if(t_m != c_m){
+            print("非同一专业\n");
+            return;
+            }else{
+                break;
+                }
         }
     }
     execute("UPDATE courses SET teacher_id=$1 WHERE id=$2",t_id,c_id);

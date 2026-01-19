@@ -1,14 +1,19 @@
-#pragma once
+module;
+#include "pqxx/pqxx"
 
+
+export module ser.teacher;
+import std;
 import domain;
-#include <pqxx/pqxx>
-#include "teacherbroker.h"
-#include "coursebroker.h"
-#include "enrollmentbroker.h"
-#include "studentbroker.h"
+import teacherbroker;
+import coursebroker;
+import enrollmentbroker;
+import studentbroker;
 
+using std::string;
+using std::print;
 
-class Serteacher{
+export class Serteacher{
 private:
     Coursebroker Coubroker;         //课程服务层
     Enrollmentbroker enbroker;      //课程选择服务层
@@ -20,7 +25,7 @@ private:
     std::vector<class Course*> teachingCourses;     //所教授的课程
 public:
     Serteacher(std::shared_ptr<pqxx::connection> conn);
-    void login();
+    bool login();
     class Teacher* getTeacher();
 
     void viewTeachingCourses(string id);        //查看教授的课程
@@ -29,10 +34,8 @@ public:
 };
 
 Serteacher::Serteacher(std::shared_ptr<pqxx::connection> conn):
-<<<<<<< HEAD
     Coubroker(conn), enbroker(conn), teabroker(conn),Stubroker(conn){}
-=======
-    Coubroker(conn), enbroker(conn), teabroker(conn){}
+
 
 bool Serteacher::login()
 {
@@ -41,9 +44,9 @@ bool Serteacher::login()
     std::cin>>id;
     print("输入密码:");
     std::cin>>password;
-    if(Teabroker.handleLogin(id, password))
+    if(teabroker.handleLogin(id, password))
     {
-        teacher = Teabroker.returnStudent(id);
+        teacher = teabroker.returnTeacher(id);
         return true;
     }
     else
@@ -60,7 +63,7 @@ class Teacher* Serteacher::getTeacher()
 //查看教授的课程
 void Serteacher::viewTeachingCourses(string id)
 {
-    teachingCourses(id);
+    teachingCourses = teabroker.obtainTeachingCourse(id,Coubroker);
     if(teachingCourses.empty())
     {
         print("你没有要教授的课程\n");
@@ -79,6 +82,10 @@ void Serteacher::viewTeachingCourses(string id)
 
 void Serteacher::evaluateGrade(string id)
 {
-    teabroker.evaluateGradeToStudent(c_id,id,Stubroker);
+    print("输入课程ID:");
+    string c_id;
+    std::cin>>c_id;
+    teabroker.showCourseAndStudent(c_id,id, Stubroker);
+    teabroker.evaluateGradeToStudent(id);
 }
->>>>>>> origin/gg-feature
+

@@ -1,11 +1,18 @@
-#pragma once
+module;
+#include "pqxx/pqxx"
+
+export module ser.secretary;
 
 import domain;
-#include "secretarybroker.h"
+import secretarybroker;
+import coursebroker;
+import std;
+using std::string;
+using std::print;
 
-class SerSecretary{
+export class SerSecretary{
 private:
-
+    Coursebroker coubroker;
     Secretarybroker secbroker;      //秘书数据层
 
     class Secretary* secretary;
@@ -27,7 +34,7 @@ public:
 };
 
 SerSecretary::SerSecretary(std::shared_ptr<pqxx::connection> conn):
-    secbroker(conn){}
+    secbroker(conn),coubroker(conn){}
 
 //获取秘书对象
 class Secretary* SerSecretary::getSercretary(){
@@ -142,5 +149,5 @@ void SerSecretary::deleteCourse(){
 //修改课程
 void SerSecretary::changeTeachersInCourse(){
     secbroker.showCourseAndTeacher();
-    secbroker.changeCT();
+    secbroker.changeCT(coubroker);
 }

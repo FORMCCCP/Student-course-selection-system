@@ -1,10 +1,12 @@
-#pragma once
+module;
+#include "pqxx/pqxx"
 
-#include <pqxx/pqxx>
+export module broker;
+
 import std;
 import domain;
 
-class Broker{
+export class Broker{
 private:
     std::shared_ptr<pqxx::connection> conn;
 public:

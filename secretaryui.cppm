@@ -1,12 +1,14 @@
-#pragma once
+module;
+#include "pqxx/pqxx"
 
-#include <pqxx/pqxx>
-#include "ser.secretary.h"
+export module secretaryui;
+import std;
+import ser.secretary;
 
 using std::string;
 using std::print;
 
-class SecretaryUI{
+export class SecretaryUI{
 private:
     std::shared_ptr<pqxx::connection> connection;
 public:

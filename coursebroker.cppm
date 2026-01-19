@@ -1,16 +1,23 @@
-#pragma once
+module;
+#include "pqxx/pqxx"
 
-#include "broker.h"
+
+export module coursebroker;
+
+import broker;
 import domain;
+import std;
+
 using std::string;
 
-class Coursebroker: public Broker{
+export class Coursebroker: public Broker{
 private:
     std::shared_ptr<pqxx::connection> connection;
 public:
     Coursebroker(std::shared_ptr<pqxx::connection> conn);
     class Course* returnCourse(std::string c_id);    //返回课程对象
     string returnCourseName(string c_id);
+    string returnCourseMajor(string c_id);
 };
 
 Coursebroker::Coursebroker(std::shared_ptr<pqxx::connection> conn):
@@ -42,4 +49,11 @@ string Coursebroker::returnCourseName(string c_id){
     string name = course->getName();
     delete course;
     return name;
+}
+
+string Coursebroker::returnCourseMajor(string c_id){
+    class Course* course = returnCourse(c_id);
+    string major = course->getMajor();
+    delete course;
+    return major;
 }

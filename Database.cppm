@@ -1,9 +1,11 @@
-#pragma once
+module;
+#include "pqxx/pqxx"
 
-#include <pqxx/pqxx>
+
+export module Database;
 import std;
 
-class Database {
+export class Database {
 private:
     std::shared_ptr<pqxx::connection> connection;
 
@@ -229,7 +231,7 @@ void Database::insertDatas(){
     execute(R"(
         INSERT INTO teachers VALUES
         ('t0001','Mr.Q','13478','历史学'),
-        ('t0320','Mr.F','26915','法学'),
+        ('t0320','Mr.F','26915','法律学'),
         ('t0113','Mr.C','33462','历史学'),
         ('t0027','Mr.N','17189','历史学');
     )");
@@ -240,13 +242,14 @@ void Database::insertDatas(){
         ('LAW003','民法学',4,58,0,'t0320',1,'大二','法律学'),
         ('HIS003','世界通史',5,64,0,'t0001',1,'大二','历史学'),
         ('HIS009','中国通史',5,64,0,'t0113',1,'大二','历史学'),
-        ('HIS010','美国史',5,47,0,'t0001',1,'大二','历史学'),
+        ('HIS010','美国史',5,47,1,'t0001',1,'大二','历史学'),
         ('HIS015','基督教史',5,32,1,'t0027',1,'大二','历史学');
     )");
 
     execute(R"(
         INSERT INTO enrollments VALUES
         ('2023002','HIS015',-1);
+        ('2023002','HIS010',3);
     )");
 
     execute(R"(
@@ -258,3 +261,4 @@ void Database::insertDatas(){
     }
 
 }
+

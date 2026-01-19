@@ -1,5 +1,5 @@
-#include "Database.h"
-#include "userui.h"
+import Database;
+import userui;
 
 int main()
 {

@@ -1,12 +1,15 @@
-#pragma once
+module;
+#include "pqxx/pqxx"
 
-#include <pqxx/pqxx>
-#include "ser.student.h"
+export module studentui;
+import std;
+
+import ser.student;
 
 using std::string;
 using std::print;
 
-class StudentUI{
+export class StudentUI{
 private:
     std::shared_ptr<pqxx::connection> connection;
 
